@@ -1,5 +1,6 @@
 # reference : https://wikidocs.net/44249
 
+# torchtext Tutorial : https://wikidocs.net/60314
 
 
 
@@ -10,22 +11,25 @@ import matplotlib.pyplot as plt
 import re
 import urllib.request
 
-
 from konlpy.tag import Okt
-
 from tqdm import tqdm
 
 
 # from tensorflow.keras.preprocessing.text import Tokenizer
 # from tensorflow.keras.preprocessing.sequence import pad_sequences
+from torchtext import data
+
+from torchtext.datasets import TranslationDataset
+from torch.nn.utils.rnn import pad_sequence
+
 
 
 # data load
 urllib.request.urlretrieve("https://raw.githubusercontent.com/e9t/nsmc/master/ratings_train.txt", filename="ratings_train.txt")
 urllib.request.urlretrieve("https://raw.githubusercontent.com/e9t/nsmc/master/ratings_test.txt", filename="ratings_test.txt")
 
-train_data = pd.read_table('../text_datasets/data_naver_movie_ratings_train.txt')
-test_data = pd.read_table('../text_datasets/data_naver_movie_ratings_test.txt')
+train_data = pd.read_table('../txt_datasets/data_naver_movie_ratings_train.txt')
+test_data = pd.read_table('../txt_datasets/data_naver_movie_ratings_test.txt')
 
 
 
@@ -97,12 +101,12 @@ print(re.sub(r'[^a-zA-Z]', '', eng_text))
 
 
 # 한글과 공백을 제외하고 모두 제거
-train_data['document'] = train_data['document'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","")
+train_data['document'] = train_data['document'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]","", regex=True)
 
 print(train_data[:5])
 
 
-train_data['document'] = train_data['document'].str.replace('^ +',"")
+train_data['document'] = train_data['document'].str.replace('^ +',"", regex=True)
 train_data['document'].replace('', np.nan, inplace=True)
 print(train_data.isnull().sum())
 
@@ -129,9 +133,9 @@ print(len(train_data))  # 145393
 # test 데이터 전처리
 test_data.drop_duplicates(subset = ['document'], inplace = True) # document 열에서 중복인 내용이 있다면 중복 제거
 
-test_data['document'] = test_data['document'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]", "") # 정규 표현식 수행
+test_data['document'] = test_data['document'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣 ]", "", regex=True) # 정규 표현식 수행
 
-test_data['document'] = test_data['document'].str.replace('^ +', "") # 공백은 empty 값으로 변경
+test_data['document'] = test_data['document'].str.replace('^ +', "",regex=True) # 공백은 empty 값으로 변경
 
 test_data['document'].replace('', np.nan, inplace=True)  # 공백은 Null 값으로 변경
 
@@ -153,9 +157,35 @@ print(okt.morphs('와 이런 것도 영화라고 차라리 뮤직비디오를 �
 
 
 
+# train_data에 형태소 분석기를 사용하여 토큰화를 하면서 불 용어를 제거하여 X_train에 저장
+X_train = []
+for sentence in tqdm(train_data['document']):
+    tokenized_sentence = okt.morphs(sentence, stem=True) # 토큰화
+    stopwords_removed_sentence = [word for word in tokenized_sentence if not word in stopwords] # 불용어 제거
+    X_train.append(stopwords_removed_sentence)
+
+
+# 상위 3개의 샘플만 출력
+print(X_train[:3])
+
+# [['아', '더빙', '진짜', '짜증나다', '목소리'], ['흠', '포스터', '보고', '초딩', '영화', '줄', '오버', 
+# '연기', '조차', '가볍다', '않다'], ['너', '무재', '밓었', '다그', '래서', '보다', '추천', '다']]
+
+
+# Test data에 대해서도 동일하게 토큰화를 해준다
+X_test = []
+for sentence in tqdm(test_data['document']):
+    tokenized_sentence = okt.morphs(sentence, stem=True) # 토큰화
+    stopwords_removed_sentence = [word for word in tokenized_sentence if not word in stopwords] # 불용어 제거
+    X_test.append(stopwords_removed_sentence)
+    
+    
+
+# 정수 인코딩 - 기계가 텍스트를 숫자로 처리할 수 있도록 훈련 데이터와 테스트 데이터에 정수 인코딩을 해야 한다.
 
 
 
+# train data에 대해서 단어 집합(Vocabulary) 만들기
 
 
 
