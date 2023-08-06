@@ -1,8 +1,11 @@
 # Logistic Regression
 
 
-I have implemented Logistic Regression. 2.1, 2.2 were implemented from scratch using only numpy, without Pytorch, 2.3 and 2.4 were implemented using Pytorch     
-Logistic Regression을 구현했습니다. 2.1, 2.2는 Pytorch를 쓰지 않고 numpy만을 이용하여 구현했으며, 2.3, 2.4는 Pytorch를 이용했습니다.
+I have implemented Logistic Regression.  
+
+2.1, 2.2 were implemented from scratch using only numpy, without Pytorch, 2.3 and 2.4 were implemented using Pytorch  
+
+(Logistic Regression을 구현했습니다. 2.1, 2.2는 Pytorch를 쓰지 않고 numpy만을 이용하여 구현했으며, 2.3, 2.4는 Pytorch를 이용했습니다.)
 
 
 
