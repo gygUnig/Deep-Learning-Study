@@ -5,9 +5,11 @@ I have implemented Linear Regression.
 - 1.1, 1.2, 1.3 were implemented from scratch using only numpy, without Pytorch
 - 1.4, 1.5 were implemented using Pytorch  
 
-(Linear Regression을 구현했습니다. 1.1, 1.2, 1.3은 Pytorch를 쓰지 않고 numpy만을 이용하여 구현했으며, 1.4, 1.5는 Pytorch를 이용했습니다.)
+Linear Regression을 구현했습니다.
+- 1.1, 1.2, 1.3은 Pytorch를 쓰지 않고 numpy만을 이용하여 구현했습니다.
+- 1.4, 1.5는 Pytorch를 이용했습니다.  
 
-
+## Code  
 
 - [1.1 Linear Regression from scratch (No Bias), Dataset : weight-height](1_Linear_Regression/1.1_Linear_Regression_from_scratch_No_Bias.py)
 
