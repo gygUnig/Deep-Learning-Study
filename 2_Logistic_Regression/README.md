@@ -17,3 +17,9 @@ I have implemented Logistic Regression.
 
 - [2.4 Logistic Regression Pytorch, Dataset : Diabetes](2_Logistic_Regression/2.4_Logistic_Regression_diabetes_Pytorch.py)     
 
+
+
+
+## Datasets  
+
+- [Diabetes Dataset](../Datasets/data_diabetes.csv)

@@ -20,3 +20,9 @@ I have implemented Linear Regression.
 - [1.5 Multi Variable Linear Regression Pytorch : Dataset : Test Score](1_Linear_Regression/1.5_Multi_Variable_Linear_Regression_Pytorch.py)      
 
 
+
+
+
+## Datasets  
+
+- [Test Score Dataset](../Datasets/data_test_score.csv)
