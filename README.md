@@ -1,7 +1,7 @@
-# Deep-Learning-Study
+# Deep-Learning-Study-Pytorch
 
-This repository contains the implementations for various deep learning models    
-이 레포지토리는 다양한 딥러닝 모델에 대한 구현 자료입니다.
+This repository contains the implementations for various deep learning models using PyTorch    
+이 레포지토리는 다양한 딥러닝 모델을 PyTorch로 구현한 자료입니다.
 
 ## Directory Structure
 
