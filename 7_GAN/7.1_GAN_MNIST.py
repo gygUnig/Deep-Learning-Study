@@ -21,7 +21,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 torch.manual_seed(1)
 
 # data load
-train_data = np.loadtxt("../csv_file/data_mnist_train.csv", delimiter=',')  # (60000, 785)
+train_data = np.loadtxt("../csv_datasets/data_mnist_train.csv", delimiter=',')  # (60000, 785)
 
 # numpy array to torch tensor
 train_data = torch.tensor(train_data, dtype=torch.float32).to(device)

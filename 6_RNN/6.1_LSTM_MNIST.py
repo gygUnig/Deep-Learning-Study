@@ -47,8 +47,8 @@ class MnistDataset(Dataset):
 
 
 # train, test dataset
-train_dataset = MnistDataset('../csv_file/data_mnist_train.csv')
-test_dataset = MnistDataset('../csv_file/data_mnist_test.csv')
+train_dataset = MnistDataset('../csv_datasets/data_mnist_train.csv')
+test_dataset = MnistDataset('../csv_datasets/data_mnist_test.csv')
 
 
 # Data Loader
