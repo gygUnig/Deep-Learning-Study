@@ -1,5 +1,5 @@
 # dog and cat Classification(kaggle data) - CNN practice
-# just train version
+# Use k-fold validation
 
 
 import numpy as np
@@ -8,6 +8,9 @@ import torch.optim as optim
 import torch.nn as nn
 from torchvision import transforms, datasets
 from torch.utils.data import DataLoader
+
+
+from sklearn.model_selection import KFold
 import time
 
 start_time = time.time()
@@ -16,7 +19,6 @@ print("Start")
 
 # Use GPU
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
 
 
 # Size to resize images
@@ -108,8 +110,8 @@ class CNN(nn.Module):
     
 
 
-# Define CNN model
-model = CNN().to(device)
+# # Define CNN model
+# model = CNN().to(device)
 
 # hyper parameters
 learning_rate = 0.001
@@ -117,34 +119,86 @@ n_epochs = 15
 
 # cost function, optimizer
 cost_function = nn.CrossEntropyLoss().to(device)
-optimizer = optim.Adam(model.parameters(), lr = learning_rate)
 
 
-# train
-for epoch in range(n_epochs):
+# optimizer = optim.Adam(model.parameters(), lr = learning_rate)
 
-    for X, Y in data_loader: # X : image data, Y : label
+# number of fold
+k_folds = 5  # # Split into 5 parts
+kfold = KFold(n_splits=k_folds, shuffle=True)
 
-        X = X.to(device)
-        Y = Y.to(device)
+# List for storing accuracy for each fold
+accuracy_list_k_fold = []
 
-        # hypothesis function
-        hypothesis = model(X)
+# kfold.split(dataset) splits the dataset into 'n_splits' and returns indices of train and test data.
+for fold, (train_ids, test_ids) in enumerate(kfold.split(dataset)): # get fold number and corresponding train, test indices by running this with enumerate
+    print("Fold {}".format(fold+1)) # Current fold under test
 
-        # cost
-        cost = cost_function(hypothesis, Y)
+    # Each fold uses a new model instance; k-fold cross validation requires independent training for each fold
+    model = CNN().to(device)
 
-        optimizer.zero_grad()  # reset gradiants
-        cost.backward()  # backpropagate errors
-        optimizer.step()   # update model parameters
+    # New optimizer for each fold due to parameter updates in the model
+    optimizer = optim.Adam(model.parameters(), lr = learning_rate)
 
-    print('epoch {}/{}, train_cost: {}'.format(
-        epoch+1, n_epochs, cost.item()
+    # torch.utils.data.Subset creates a subset of the dataset based on provided indices
+    train_subset = torch.utils.data.Subset(dataset, train_ids)
+    test_subset = torch.utils.data.Subset(dataset, test_ids)
+
+    # DataLoader from the generated train dataset loads data in batches during training
+    train_loader = DataLoader(train_subset, batch_size=64, shuffle=True)
+    test_loader = DataLoader(test_subset, batch_size=64, shuffle=False)  # # No shuffle for test data as order does not affect evaluation
+
+
+    # Train
+    for epoch in range(n_epochs):
+
+        for X, Y in train_loader:
+
+            X = X.to(device)
+            Y = Y.to(device)
+
+            # hypothesis
+            hypothesis = model(X)
+            
+            # cost
+            cost = cost_function(hypothesis, Y)
+
+            optimizer.zero_grad() # reset gradiants
+            cost.backward() # backpropagate errors
+            optimizer.step() # update model parameters
+
+        print('epoch {}/{}, train_cost:{}'.format(
+            epoch+1, n_epochs, cost.item()
+        ))
+
+    # Test
+    correct = 0
+    total = 0
+
+    with torch.no_grad():
+
+        for X, Y in test_loader:
+
+            X = X.to(device)
+            Y = Y.to(device)
+
+            output = model(X)
+            predict = torch.argmax(output, dim=1)
+
+            total += Y.size(0)
+            correct += (predict == Y).sum().item()
+    
+    accuracy = 100 * correct / total
+    accuracy_list_k_fold.append(accuracy)
+    print('Accuracy for fold {} : {} %'.format(
+        fold + 1, accuracy
     ))
 
-# save model
-torch.save(model.state_dict(),"./checkpoint/5.3_CNN_dog_cat_just_train_gygUnig.pt")
+    torch.save(model.state_dict, "./checkpoint/5.3_CNN_dogs_vs_cats_k_fold_validation_Pytorch_Fold{}.pt".format(fold+1))
 
+
+# Average accuracy for all folds
+print('Average Accuracy : {} %'.format(sum(accuracy_list_k_fold) / len(accuracy_list_k_fold)))
 
 
 print("End")

@@ -1,14 +1,20 @@
 # Softmax Regression
 
-
-I have implemented Softmax Regression.  
-- 3.1 was implemented from scratch using only numpy, without Pytorch
-- 3.2 and 3.3 were implemented using Pytorch  
-
 Softmax Regression을 구현했습니다.
-- 3.1은 Pytorch를 쓰지 않고 numpy만을 이용하여 구현했습니다.
-- 3.2, 3.3은 Pytorch를 이용했습니다.  
 
+---
+
+### from the scratch
+- 3.1 : numpy만을 이용해서 Softmax Regression을 구현했습니다.
+
+### Pytorch
+- 3.2 : Softmax Regression을 구현했습니다. 원핫인코딩을 직접 한 후 cost를 계산한 Low level 버전입니다.
+- 3.3 : Softmax Regression을 구현했습니다. torch.nn.functional.cross_entropy()를 사용한 High level 버전입니다.
+
+### Tensorflow
+- 3.4 : Softmax Regression을 구현했습니다. 
+
+---
 
 ## Code  
 
@@ -17,6 +23,10 @@ Softmax Regression을 구현했습니다.
 - [3.2 Softmax Regression Pytorch - low level, Dataset : Zoo](3_Softmax_Regression/3.2_Softmax_Regression_zoo_Pytorch_1.py)    
 
 - [3.3 Softmax Regression Pytorch - high level, Dataset : Zoo](3_Softmax_Regression/3.3_Softmax_Regression_zoo_Pytorch_2.py)    
+
+---
+
+- [3.4 Softmax Regression Tensorflow, Dataset : Zoo](3_Softmax_Regression/3.4_Softmax_Regression_zoo_Tensorflow.py)    
 
 
 

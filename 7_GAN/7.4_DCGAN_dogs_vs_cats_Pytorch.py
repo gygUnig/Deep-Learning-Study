@@ -203,8 +203,8 @@ for epoch in range(n_epoch):
         ))
 
 # save model
-torch.save(model_D.state_dict(), "./checkpoint/7.4_DCGAN_dogs_vs_cats_model_D_v2.pt")
-torch.save(model_G.state_dict(), "./checkpoint/7.4_DCGAN_dogs_vs_cats_model_G_v2.pt")
+torch.save(model_D.state_dict(), "./checkpoint/7.4_DCGAN_dogs_vs_cats_Pytorch_model_D.pt")
+torch.save(model_G.state_dict(), "./checkpoint/7.4_DCGAN_dogs_vs_cats_Pytorch_model_G.pt")
 
 # generate noise for test and create images
 test_noise = torch.randn(25, 100, 1, 1).to(device)

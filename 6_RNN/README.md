@@ -1,26 +1,37 @@
-# Recurrent Neural Network
+# Recurrent Neural Network   
 
+Recurrent Neural Network를 구현했습니다.   
 
-I have implemented Recurrent Neural Network using Pytorch.  
-- 6.1 is LSTM model designed for classifying the MNIST Dataset  
-- 6.2 is LSTM model designed for Sentiment Analysis for Naver Movie Review Dataset  
+---
 
-Pytorch를 사용하여 Recurrent Neural Network를 구현했습니다. 
-- 6.1은 MNIST 데이터셋을 분류하는 LSTM 모델입니다.
-- 6.2는 네이버 영화 리뷰 데이터셋에 대한 감정 분석을 하는 LSTM 모델입니다.   
+### Pytorch
 
+- 6.1 : MNIST 데이터셋을 분류하는 multi layer LSTM 모델입니다.
+- 6.2 : 네이버 영화 리뷰 데이터셋에 대한 감정 분석을 하는 기본 RNN 모델입니다.   
+- 6.3 : 네이버 영화 리뷰 데이터셋에 대한 감정 분석을 하는 Multi layer bi-directional LSTM 모델입니다.  
+
+### Tensorflow
+
+- 6.4 : MNIST 데이터셋을 분류하는 multi layer LSTM 모델입니다.
+
+---
 
 ## Code  
 
-- [6.1 LSTM, Dataset : MNIST](6_RNN/6.1_LSTM_MNIST.py)
+- [6.1 LSTM Pytorch, Dataset : MNIST](6_RNN/6.1_LSTM_MNIST.py)
 
-- [6.2 LSTM - Sentiment Analysis, Dataset : Naver Movie Review](6_RNN/6.2_LSTM_Movie_Review_Sentiment_Analysis.py)    
+- [6.2 RNN Pytorch - Sentiment Analysis, Dataset : Naver Movie Review](6_RNN/6.2_RNN_Sentiment_Analysis_Pytorch.ipynb)    
 
+- [6.3 LSTM Pytorch - Sentiment Analysis, Dataset : Naver Movie Review](6_RNN/6.3_LSTM_Sentiment_Analysis_Pytorch.ipynb)     
+
+---
+
+- [6.4 LSTM Tensorflow, Dataset : MNIST](6_RNN/6.4_LSTM_MNIST_Tensorflow.py)     
 
 
 ## Datasets  
 
 - [MNIST.csv Dataset](https://www.kaggle.com/datasets/oddrationale/mnist-in-csv)  
 
-- [Naver Movie Review train Dataset](../Datasets/data_naver_movie_ratings_train.txt)
-- [Naver Movie Review test Dataset](../Datasets/data_naver_movie_ratings_test.txt)
+- [Naver Movie Review train Dataset](../Datasets/ratings_train.txt)
+- [Naver Movie Review test Dataset](../Datasets/ratings_test.txt)

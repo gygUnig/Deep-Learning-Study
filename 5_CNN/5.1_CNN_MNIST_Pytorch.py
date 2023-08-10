@@ -138,7 +138,7 @@ for epoch in range(n_epoch):
 
 
 # save model
-torch.save(model.state_dict(), "./checkpoint/5.1_CNN_MNIST_gygUnig.pt")
+torch.save(model.state_dict(), "./checkpoint/5.1_CNN_MNIST_Pytorch.pt")
 
 
 # test & accuracy
