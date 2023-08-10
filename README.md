@@ -1,4 +1,4 @@
-# Deep-Learning-Study-Pytorch
+# Deep-Learning-Study
 
 이 레포지토리는 다양한 딥러닝 모델을 PyTorch와 Tensorflow로 구현하며 공부한 자료입니다.  
 
