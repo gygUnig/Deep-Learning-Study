@@ -8,7 +8,8 @@ Recurrent Neural Network를 구현했습니다.
 
 - 6.1 : MNIST 데이터셋을 분류하는 multi layer LSTM 모델입니다.
 - 6.2 : 네이버 영화 리뷰 데이터셋에 대한 감정 분석을 하는 기본 RNN 모델입니다.   
-- 6.3 : 네이버 영화 리뷰 데이터셋에 대한 감정 분석을 하는 Multi layer bi-directional LSTM 모델입니다.  
+- 6.3 : 네이버 영화 리뷰 데이터셋에 대한 감정 분석을 하는 Multi layer bi-directional LSTM 모델입니다.    
+- 6.5 : IBDM 영화 리뷰 데이터셋에 대한 감정 분석을 하는 GRU 모델입니다. 
 
 ### Tensorflow
 
