@@ -1,4 +1,4 @@
-# MNIST Classification practice : Recurrent Neural Network(RNN)
+# MNIST Classification practice : Long Short Term Memory(LSTM)
 # Using Pytorch
 
 

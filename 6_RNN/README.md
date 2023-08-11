@@ -20,9 +20,12 @@ Recurrent Neural Network를 구현했습니다.
 
 - [6.1 LSTM Pytorch, Dataset : MNIST](6_RNN/6.1_LSTM_MNIST.py)
 
-- [6.2 RNN Pytorch - Sentiment Analysis, Dataset : Naver Movie Review](6_RNN/6.2_RNN_Sentiment_Analysis_Pytorch.ipynb)    
+- [6.2 RNN Pytorch - Korean Sentiment Analysis, Dataset : Naver Movie Review](6_RNN/6.2_RNN_Korean_Sentiment_Analysis_Pytorch.ipynb)    
 
-- [6.3 LSTM Pytorch - Sentiment Analysis, Dataset : Naver Movie Review](6_RNN/6.3_LSTM_Sentiment_Analysis_Pytorch.ipynb)     
+- [6.3 LSTM Pytorch - Korean Sentiment Analysis, Dataset : Naver Movie Review](6_RNN/6.3_LSTM_Korean_Sentiment_Analysis_Pytorch.ipynb)     
+
+- [6.5 GRU Pytorch - IMDB Sentiment Analysis, Dataset : IMDB ](6_RNN/6.5_GRU_IMDB_Sentiment_Analysis_Pytorch.ipynb)     
+
 
 ---
 
@@ -35,3 +38,5 @@ Recurrent Neural Network를 구현했습니다.
 
 - [Naver Movie Review train Dataset](../Datasets/ratings_train.txt)
 - [Naver Movie Review test Dataset](../Datasets/ratings_test.txt)
+
+- [IMDB Dataset](https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews)
