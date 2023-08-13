@@ -27,6 +27,7 @@ Recurrent Neural Network를 구현했습니다.
 
 - [6.5 GRU Pytorch - IMDB Sentiment Analysis, Dataset : IMDB ](6_RNN/6.5_GRU_IMDB_Sentiment_Analysis_Pytorch.ipynb)     
 
+- [6.6 RNN Pytorch - character_level_many_to_many_RNN, Dataset : Custom Dataset ](6_RNN/6.6_RNN_character_level_many_to_many_Pytorch.ipynb)     
 
 ---
 

@@ -30,7 +30,7 @@ This repository contains materials studied while implementing various deep learn
 
 ### [6. RNN](6_RNN/)
 - Implementations of RNN models using Pytorch, Tensorflow
-- Datasets: MNIST, Naver Movie Review
+- Datasets: MNIST, Naver Movie Review, IBDM, Custom Dataset
 
 ### [7. GAN](7_GAN/)
 - Implementations of GAN models using Pytorch, Tensorflow
