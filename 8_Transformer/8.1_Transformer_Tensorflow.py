@@ -1,6 +1,7 @@
 # Transformer 구현
 # reference : https://wikidocs.net/31379
 
+
 import numpy as np
 import tensorflow as tf
 
