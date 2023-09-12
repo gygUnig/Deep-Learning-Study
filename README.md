@@ -34,7 +34,8 @@ This repository contains materials studied while implementing various deep learn
 
 ### [7. GAN](7_GAN/)
 - Implementations of GAN models using Pytorch, Tensorflow
-- Datasets: MNIST, Dogs vs Cats, Cats
+- Datasets: MNIST, Dogs vs Cats, Cats  
 
-
+### [8. Transformer](8_Transformer/)
+- Implementations Transformer models using Pytorch, Tensorflow
 

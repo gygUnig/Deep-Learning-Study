@@ -343,7 +343,7 @@ def encoder(max_length, vocab_size, num_layers, dff, d_model, num_heads, dropout
 
     Args:
         - max_length (int): 입력 시퀀스의 최대 길이. 포지셔널 인코딩 벡터를 생성할 때 사용된다.
-        - vocab_size (int) : 단어장의 크기. 임베딩 레이어에서 사용되는 최대 단어 수 (10000 같은 것)
+        - vocab_size (int) : 어휘 크기. 임베딩 레이어에서 사용되는 최대 단어 수 (10000 같은 것)
         - num_layers (int): 인코더 레이어를 쌓을 개수
         - dff (int): 피드 포워드 신경망의 은닉층 차원
         - d_model (int): 임베딩 벡터의 차원, 트랜스포머 모든 층의 입-출력 차원
@@ -415,28 +415,53 @@ def create_look_ahead_mask(x):
                                               [-2, -1,  0, 1]
                                               [ 0, -2, -1, 0]]   
     """
-    
     seq_len = tf.shape(x)[1]  # x의 2번째는 sequence_length
     
+    # look ahead mask와 padding mask
     look_ahead_mask = 1 - tf.linalg.band_part(tf.ones((seq_len, seq_len)), -1, 0)
     padding_mask = create_padding_mask(x)
     
     return tf.maximum(look_ahead_mask, padding_mask)
 
 
-# Decoder
+
 def decoder_layer(dff, d_model, num_heads, dropout, name="decoder_layer"):
+    """
+    디코더의 한 레이어
+
+    Args:
+        - dff (int): 피드 포워드 신경망의 은닉층 차원
+        - d_model (int): 임베딩 벡터의 차원, 트랜스포머 모든 층의 입-출력 차원
+        - num_heads (int): 멀티 헤드 어텐션에서 헤드의 갯수
+        - dropout (float): 드롭아웃 비율
+        - name (str): 모델 이름. 기본값은 "decoder_layer"
+
+    Returns:
+        tf.keras.Model: 디코더 레이어의 구조를 가진 Keras 모델
+    
+    Notes:
+    1. 두 번의 멀티 헤드 어텐션을 거친다
+        - 첫 번째는 look-ahead mask를 사용해서 현재 위치 이후의 정보에 접근하지 않게 한다.
+        - 두 번째는 인코더의 출력(Value, Key)과 디코더의 Query를 이용한 어텐션이다. 여기서는 padding mask만 사용한다
+    2. 멀티 헤드 어텐션 후에는 각각 잔차 연결과 층 정규화가 진행된다.
+    3. 포지션 와이즈 피드 포워드 신경망을 거치고, 잔차연결과 층 정규화를 진행한다.
+    
+    """
+    
+    # 디코더 레이어의 인풋. shape = (None, d_model)인데 여기서 None은 시퀀스 길이를 의미한다.
     inputs = tf.keras.Input(shape=(None, d_model), name="inputs")
+    
+    # 인코더에서 나온 출력값을 받는다.
     enc_outputs = tf.keras.Input(shape=(None, d_model), name="encoder_outputs")
     
-    # look ahead mask
+    # look ahead mask - 디코더가 미래의 정보에 접근하지 못하게 하는데 사용된다.
     look_ahead_mask = tf.keras.Input(
         shape=(1, None, None), name = "look_ahead_mask")
     
     # padding mask
     padding_mask = tf.keras.Input(shape=(1,1,None), name="padding_mask")
     
-    # 멀티 헤드 어텐션
+    # 디코더의 첫 번째 멀티 헤드 어텐션 - self attention이다, look ahead mask를 적용한다.
     attention1 = MultiHeadAttention(d_model, num_heads, name="attention1")(
         inputs = {
             'query': inputs, 'key': inputs, 'value': inputs,
@@ -447,7 +472,7 @@ def decoder_layer(dff, d_model, num_heads, dropout, name="decoder_layer"):
     # 잔차 연결과 층 정규화
     attention1 = tf.keras.layers.LayerNormalization(epsilon=1e-6)(attention1 + inputs)
     
-    # 멀티 헤드 어텐션
+    # 디코더의 두 번째 멀티 헤드 어텐션 - self attention이 아니다
     attention2 = MultiHeadAttention(
         d_model, num_heads, name="attention2")(
             inputs = {
@@ -475,8 +500,26 @@ def decoder_layer(dff, d_model, num_heads, dropout, name="decoder_layer"):
     )
     
 
-# Decoder 쌓기
-def decoder(max_length, num_layers, dff, d_model, num_heads, dropout, name="decoder"):
+
+def decoder(max_length, vocab_size, num_layers, dff, d_model, num_heads, dropout, name="decoder"):
+    """
+    디코더를 num_layers만큼 쌓는 함수
+
+    Args:
+        - max_length (int): 입력 시퀀스의 최대 길이
+        - vocab_size (int) : 어휘 크기. 임베딩 레이어에서 사용되는 최대 단어 수 (10000 같은 것)
+        - num_layers (int): 디코더 레이어를 몇 개 쌓을 것인지에 대한 수
+        - dff (int): 포지션 와이즈 피드 포워드 레이어의 은닉층 크기
+        - d_model (int): 임베딩 벡터의 차원, 트랜스포머 모든 층의 입-출력 차원
+        - num_heads (int): 멀티 헤드 어텐션에서의 헤드 수
+        - dropout (float): 드롭아웃 비율
+        - name (str): 모델의 이름. 기본값은 "decoder".
+
+    Returns:
+        tf.keras.Model: 디코더 모델
+    """
+    
+    # (None, d_model) shape의 입력
     inputs = tf.keras.Input(shape=(None, d_model), name='inputs')
     enc_outputs = tf.keras.Input(shape=(None, d_model), name = 'encoder_outputs')
     
@@ -486,7 +529,7 @@ def decoder(max_length, num_layers, dff, d_model, num_heads, dropout, name="deco
     padding_mask = tf.keras.Input(shape = (1,1,None), name = 'padding_mask')
     
     # 포지셔널 인코딩 + 드롭아웃
-    embeddings = tf.keras.layers.Enbedding(max_length, d_model)(inputs)
+    embeddings = tf.keras.layers.Embedding(vocab_size, d_model)(inputs)
     embeddings *= tf.math.sqrt(tf.cast(d_model, tf.float32))
     embeddings = PositionalEncoding(max_length, d_model)(embeddings)
     outputs = tf.keras.layers.Dropout(rate=dropout)(embeddings)
@@ -504,8 +547,24 @@ def decoder(max_length, num_layers, dff, d_model, num_heads, dropout, name="deco
     )
     
     
-# Transformer 구현
+    
 def transformer(vocab_size, max_length, num_layers, dff, d_model, num_heads, dropout, name="transformer"):
+    """
+    트랜스포머 모델 생성 함수
+
+    Args:
+        vocab_size (int): 어휘 크기. 출력층에 사용된다
+        max_length (int): 시퀀스의 최대 길이
+        num_layers (int): 인코더, 디코더 레이어의 수
+        dff (int): 피드 포워드 레이어의 은닉층 크기
+        d_model (int): 임베딩 벡터의 차원
+        num_heads (int): 멀티 헤드 어텐션에서의 헤드 수
+        dropout (float): 드롭아웃 비율
+        name (str): 모델 이름. 기본값은 "transformer".
+
+    Returns:
+        tf.keras.Model : 트랜스포머 구조의 Keras 모델
+    """
     
     # 인코더의 입력
     inputs = tf.keras.Input(shape=(None,), name = "inputs")
