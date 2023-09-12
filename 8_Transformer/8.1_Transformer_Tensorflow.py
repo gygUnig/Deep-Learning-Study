@@ -1,6 +1,6 @@
-# Transformer 구현
+# Transformer 구현 - Tensorflow
 # reference : https://wikidocs.net/31379
-# 목표 : docstring과 주석 꼼꼼하게 달기!
+# 목표 : 단순 필사가 아닌, docstring과 주석 꼼꼼하게 달기!
 
 
 import numpy as np
