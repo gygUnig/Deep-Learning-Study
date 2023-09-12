@@ -8,3 +8,4 @@ txt_datasets/
 7_GAN/checkpoint/
 
 6_RNN/.data/
+8_Transformer/ChatBotData.csv
