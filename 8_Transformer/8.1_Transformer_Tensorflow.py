@@ -1,22 +1,73 @@
 # Transformer 구현
 # reference : https://wikidocs.net/31379
+# 목표 : docstring과 주석 꼼꼼하게 달기!
 
 
 import numpy as np
 import tensorflow as tf
 
 
-# Positional Encoding
 class PositionalEncoding(tf.keras.layers.Layer):
+    """
+    Positional Encoding 레이어
+    단어의 위치 정보를 얻기 위해서 각 단어의 임베딩 벡터에 위치 정보들을 더하여 모델의 입력으로 사용한다.
+    
+    Attributes: 
+    - pos_encoding (tf.Tensor) : Positional encoding tensor로, positional_encoding 메소드를 통해
+      계산된 포지셔널 인코딩 값을 가지게 되며, call 메소드에서 inputs에 더해진다.
+    """
+    
     def __init__(self, position, d_model):
+        """
+        PositionalEncoding 클래스의 초기화 메소드
+        
+        Args:
+            - position (int) : 최대 시퀀스 길이 
+            - d_model (int) : 임베딩 벡터의 차원, 트랜스포머의 모든 층의 입-출력 차원
+        """
+        
         super().__init__()
         self.pos_encoding = self.positional_encoding(position, d_model)
         
     def get_angles(self, position, i, d_model):
+        """
+        Positional Encoding의 각도를 계산하는 메소드이다.
+        1/(10000^(wi/d_model))에 해당하는 값이다.
+
+        Args:
+            - position (tf.Tensor): positional_encoding 메서드에서 int인 positional을 받아서 tf.range를 통해서
+              0 ~ position-1 까지의 텐서를 생성한다. 이 텐서가 get_angles 메서드에 position으로 전달된다.
+                
+            - i (tf.Tensor): positional_encoding 메서드에서 int인 d_model을 받아서 tf.range를 통해서
+              0 ~ d_model 까지의 텐서를 생성한다. 이 텐서가 get_angles 메서드에 i로 전달된다.
+                
+            - d_model (int): 임베딩 벡터의 차원
+
+        Returns:
+            - tf.Tensor : position과 angles를 곱해서 만들어진 텐서. Positional Encoding을 할 때 sin과 cos함수의
+                입력값으로 사용된다. shape : (position, d_model)
+        """
+        
         angles = 1/tf.pow(10000, (2*(i//2)) / tf.cast(d_model, tf.float32))
         return position * angles
     
     def positional_encoding(self, position, d_model):
+        """
+        Positional encoding을 계산하는 메서드
+
+        Args:
+            - position (int): 최대 시퀀스 길이
+            - d_model (int): 임베딩 벡터의 차원
+
+        Returns:
+            - tf.Tensor : Positional Encoding 값을 포함하는 3D 텐서
+              입력 시퀀스의 각 위치에 대해서 특정 값들을 더해줘서 단어의 위치 정보를 얻을 수 있다.
+            
+        """
+        
+        # 위에서 정의한 get_angles 메서드의 인자로 (position,1)의 shape를 가진 텐서인 position,
+        # (1, d_model)의 shape를 가진 텐서인 i, d_model을 넣어준다.
+        # 이에 대한 결과인 angle_rads는 (position, d_model)의 shape를 가진 2D 텐서가 된다.
         angle_rads = self.get_angles(
             position = tf.range(position, dtype=tf.float32)[:, tf.newaxis],
             i = tf.range(d_model, dtype=tf.float32)[tf.newaxis, :],
@@ -24,64 +75,112 @@ class PositionalEncoding(tf.keras.layers.Layer):
         )
         
         # 배열의 짝수 인엑스(2i)에는 사인 함수 적용
-        sines = tf.math.sin(angle_rads[:, 0::2])
+        angle_rads[:, 0::2] = tf.math.sin(angle_rads[:, 0::2])
         
         #배열의 홀수 인덱스(2i+1)에는 코사인 함수 적용
-        cosines = tf.math.cos(angle_rads[:, 1::2])
+        angle_rads[:, 1::2] = tf.math.cos(angle_rads[:, 1::2])
         
-        angle_rads = np.zeros(angle_rads.shape)
-        angle_rads[:, 0::2] = sines
-        angle_rads[:, 1::2] = cosines
         
         pos_encoding = tf.constant(angle_rads)
-        pos_encoding = pos_encoding[tf.newaxis, ...]
+        pos_encoding = pos_encoding[tf.newaxis, ...] # pos_encoding의 shape는 (1, position, d_model)
         
-        print(pos_encoding.shape)
         return tf.cast(pos_encoding, tf.float32)
     
     def call(self, inputs):
+        """
+        PositionalEncoding layer의 호출 메서드
+
+        Args:
+            - inputs (tf.Tensor): 임베딩 된 시퀀스
+
+        Returns:
+            - tf.Tensor : 임베딩 된 시퀀스에 Positioanl Encoding이 더해진 값
+        """
         return inputs + self.pos_encoding[:, :tf.shape(inputs)[1], :]
     
     
-# scaled dot-product attention
-def scaled_dot_product_attention(query, key, value, mask):
-    # query 크기 : (batch_size, num_heads, query문장길이, d_model/num_heads)
-    # key 크기   : (batch_size, num_heads, key문장길이, d_model/num_heads)
-    # value 크기 : (batch_size, num_heads, value문장길이, d_model/num_heads)
-    # padding_mask : (batch_size, 1, 1, key문장길이)
     
-    # Q와 K의 곱, 어텐션 스코어 행렬
+def scaled_dot_product_attention(query, key, value, mask):
+    """
+    스케일드 닷 프로덕트 어텐션 함수
+    
+    query, key, value를 사용하여 Attention Value Matrix를 구한다.
+
+    Args:
+        - query (tf.Tensor): 쿼리 텐서
+          shape : (batch_size, num_heads, query 문장 길이, d_model/num_heads)
+        - key (tf.Tensor): 키 텐서
+          shape : (batch_size, num_heads, key 문장 길이, d_model/num_heads)
+        - value (tf.Tensor): 벨류 텐서
+          shape : (batch_size, num_heads, value 문장 길이, d_model/num_heads)
+        - mask (tf.Tensor): 어텐션 스코어 행렬에 적용될 마스크 텐서(softmax 적용 전)
+          shape : (batch_size, 1, 1, key 문장 길이)
+
+    Returns:
+        - output(tf.Tensor) : Attention Value Tensor (softmax를 거친 후 value과 matmul한 결과값)
+          shape : (batch_size, num_heads, qeury문장 길이, d_model/num_heads)
+        - attention_weights(tf.Tensor) : Attention weight Tensor(softmax를 거친 후 value와 matmul하기 전)
+          attention_weights와 value를 matmul하면 output이 된다.
+          shape : (batch_size, num_heads, qeury 문장 길이, key 문장 길이)
+    """
+
+    # Q와 K.T의 곱
     matmul_qk = tf.matmul(query, key, transpose_b=True)
     
-    # 스케일링 - dk의 루트값으로 나눠준다
+    # tf.shape(key)[-1]은 d_model/num_heads이고, 이 값은 d_k이다.
     depth = tf.cast(tf.shape(key)[-1], tf.float32)
+    
+    # matmul_qk를 d_k의 루트값으로 나눠준 값이 attention score이 된다.
     logits = matmul_qk / tf.math.sqrt(depth)
+    
     
     # 마스킹. 어텐션 스코어 행렬의 마스킹 할 위치에 매우 작은 음수값을 넣는다.
     # 매우 작은 값이므로 소프트 맥스 함수를 지나면 행렬의 해당 위치의 값은 0이 된다.
     if mask is not None:
-        logits += (mask * -1e9)
+        logits += (mask * -1e9)  # 이때 mask의 크기는 (batch_size, 1, 1, key 문장 길이)인데, 
+        # logits의 크기는 (batch_size, num_heads, query 문장 길이, key문장 길이)이다.
+        # 따라서 브로드캐스팅이 되어서 key에 <PAD>가 있는 경우에는 해당 열 전체를 마스킹을 해주게 된다.
         
     # 소프트맥스 함수는 마지막 차원인 Key의 문장 길이 방향으로 수행된다.
-    # attention weight : (batch_size, num_heads, query문장길이, key문장길이)
     attention_weights = tf.nn.softmax(logits, axis = -1)
     
-    # output : (batch_size, num_heads, query문장 길이, d_model/num_heads)
+    # attention weights와 value를 matmul한다.
     output = tf.matmul(attention_weights, value)
     
     return output, attention_weights
 
 
-# Multi Head Attention
+
 class MultiHeadAttention(tf.keras.layers.Layer):
+    """
+    멀티 헤드 어텐션 클래스
+    여러 헤드에서 각각 어텐션을 계산한 후, 결과를 concatenate하여 반환한다.
+
+    Attributes:
+    - num_heads (int) : 어텐션 헤드의 갯수
+    - d_model (int) : 임베딩 벡터의 차원, 트랜스포머의 모든 층의 입-출력 차원
+    - depth (int) : d_model을 num_heads로 나눈 값, 각 헤드에서의 차원
+    - query_dense, key_dense, value_dense (tf.keras.layers.Dense) : WQ, WK, WV에 해당하는 밀집층
+    - dense (tf.keras.layers.Dense) : WO에 해당하는 밀집층
+    """
+    
     def __init__(self, d_model, num_heads, name="multi_head_attention"):
+        """
+        멀티 헤드 어텐션 객체 초기화 메서드
+
+        Args:
+            - d_model (int) : 임베딩 벡터의 차원, 트랜스포머 모든 층의 입-출력 차원
+            - num_heads (int) : 어텐션 헤드의 갯수
+            - name (str): 레이어 이름, 기본값은 "multi_head_attention"
+        """
         super().__init__(name=name)
         self.num_heads = num_heads
         self.d_model = d_model
         
+        # d_model이 num_heads로 나누어 떨어지지 않는다면 assert 에러
         assert d_model % self.num_heads == 0
         
-        # d_model을 num_heads로 나눈 값. 논문 기준 64
+        # depth는 d_model을 num_heads로 나눈 값. 논문 기준 64
         self.depth = d_model // self.num_heads
         
         # WQ, WK, WV에 해당하는 밀집층 정의
@@ -94,12 +193,37 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         
     # num_heads 개수만큼 q, k, v를 split하는 함수
     def split_heads(self, inputs, batch_size):
+        """
+        inputs을 num_heads만큼 split하는 메서드
+        여기서 inputs이란? query, key, value가 될 것이다.
+
+        Args:
+            - inputs (tf.Tensor): split할 입력 텐서. 여기서는 q, k, v
+            - batch_size (int): 배치 사이즈
+
+        Returns:
+            - tf.Tensor: 헤드 수만큼 나뉘어진 텐서
+        """
+        
+        # inputs을 reshape해서 (batch_size, 문장 길이, num_heads, d_model/num_heads)의 shape를 갖도록 나눈다
         inputs = tf.reshape(
             inputs, shape=(batch_size, -1, self.num_heads, self.depth)
         )
-        return tf.transpose(inputs, perm = [0,2,1,3])
+        return tf.transpose(inputs, perm = [0,2,1,3]) # (batch_size, num_heads, 문장길이, d_model/num_heads)
+    
     
     def call(self, inputs):
+        """
+        멀티 헤드 어텐션의 연산을 수행하는 메서드
+
+        Args:
+            - inputs (dict): query, key, value, mask 정보가 있는 딕셔너리
+
+        Returns:
+            - tf.Tensor: 멀티 헤드 어텐션의 결과
+        """
+        
+        # inputs은 딕셔너리 형태. query, key, value, mask 정보가 있다.
         query, key, value, mask = inputs['query'], inputs['key'], inputs['value'], inputs['mask']
         batch_size = tf.shape(query)[0]
         
@@ -136,18 +260,57 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         return outputs
         
         
-# 패딩 마스크
+
 def create_padding_mask(x):
+    """
+    패딩 마스킹을 생성하는 함수
+    입력된 시퀀스에서 0의 값을 가진 위치를 찾아서 해당 위치를 마스킹한다.
+    패딩된 위치에 대해서 어텐션 연산 무시
+
+    Args:
+        - x (tf.Tensor): 패딩 마스크를 적용할 시퀀스. shape는 (batch_size, sequence_length)
+
+    Returns:
+        - tf.Tensor: 패딩 마스크가 적용된 텐서. shape는 (batch_size, 1, 1, sequence_length)
+          0인 위치에는 1의 값을, 그 외에는 0의 값을 가진다.
+    """
+    
+    # tf.math.equal(x, 0)은 0과 같으면 True, 아니면 False를 반환하는 것이다. 
+    # 이 때 캐스팅을 tf.float32로 하므로 True는 1이 되고 False는 0이 된다.
+    # 따라서 mask는 0은 1로 바꾸고, 0이 아니면 0으로 바꾼다.
     mask = tf.cast(tf.math.equal(x, 0), tf.float32)
-    # (batch_size, 1, 1, key의 문장 길이)
-    return mask[:, tf.newaxis, tf.newaxis, :]
+   
+    return mask[:, tf.newaxis, tf.newaxis, :]  # (batch_size, 1, 1, key의 문장 길이)
 
 
-# Encoder
+
 def encoder_layer(dff, d_model, num_heads, dropout, name = "encoder_layer"):
+    """
+    인코더 레이어 함수
+    
+    두 개의 서브 레이어로 나뉘어져 있다.
+    1. 멀티 헤드 어텐션
+    2. 포지션 와이즈 피드 포워드 신경망
+    
+    각 서브 레이어는 잔차 연결과 층 정규화가 진행된다.
+
+    Args:
+        - dff (int) : 포지션 와이즈 피드 포워드 신경망의 은닉층 차원
+        - d_model (int) : 임베딩 벡터의 차원, 트랜스포머 모든 층의 입-출력 차원
+        - num_heads (int) : 멀티 헤드 어텐션 헤드 수
+        - dropout (float) : Dropout 비율
+        - name (str) : 인코더 레이어의 이름. 기본값은 "encoder_layer"
+        
+    Returns:
+        - tf.keras.Model: 인코더 레이어 모델
+    """
+    
+    # 입력층 정의
+    # shape = (None, d_model) 에서 None은 정의가 안 된 상태이므로 어떤 길이의 문장이 들어와도 처리할 수 있다.
     inputs = tf.keras.Input(shape = (None, d_model), name="inputs")
     
     # 패딩 마스크 사용
+    # shape=(1, 1, None)에서 마지막 None은 패딩 마스크의 길이(key 문장 길이)에 해당한다.
     padding_mask = tf.keras.Input(shape = (1, 1, None), name = "padding_mask")
     
     # 멀티 헤드 어텐션
@@ -173,19 +336,45 @@ def encoder_layer(dff, d_model, num_heads, dropout, name = "encoder_layer"):
     )
 
 
-# Encoder 쌓기
-def encoder(max_length, num_layers, dff, d_model, num_heads, dropout, name="encoder"):
+
+def encoder(max_length, vocab_size, num_layers, dff, d_model, num_heads, dropout, name="encoder"):
+    """
+    트랜스포머 인코더를 쌓는 함수
+
+    Args:
+        - max_length (int): 입력 시퀀스의 최대 길이. 포지셔널 인코딩 벡터를 생성할 때 사용된다.
+        - vocab_size (int) : 단어장의 크기. 임베딩 레이어에서 사용되는 최대 단어 수 (10000 같은 것)
+        - num_layers (int): 인코더 레이어를 쌓을 개수
+        - dff (int): 피드 포워드 신경망의 은닉층 차원
+        - d_model (int): 임베딩 벡터의 차원, 트랜스포머 모든 층의 입-출력 차원
+        - num_heads (int): 멀티 헤드 어텐션에서 헤드의 개수
+        - dropout (float): 드롭아웃 비율
+        - name (str): 모델 이름. 기본값은 "encoder".
+
+    Returns:
+        - tf.keras.Model: 인코더 구조를 가진 Keras 모델
+        
+    Notes:
+    1. 입력은 임베딩 레이어를 거쳐서 임베딩 벡터로 변환된다.
+    2. 포지셔널 인코딩 레이어를 통해 임베딩 벡터에 위치 정보를 추가한다.
+    3. num_layers만큼의 인코더 레이어를 거쳐서 최종 출력을 얻는다. 이 떄, 각 레이어는 멀티 헤드 어텐션과
+       피드 포워드 신경망을 포함하며, 잔차 연결과 층 정규화를 진행한다.
+    """
+    
+    # Input 텐서 정의. shape = (None,)라는 것은 입력 시퀀스의 길이가 다양하다는 것을 의미한다.
     inputs = tf.keras.Input(shape=(None,), name="inputs")
     
-    # 패딩 마스크 사용
+    # 패딩 마스크를 위한 Input 텐서 정의
     padding_mask = tf.keras.Input(shape=(1,1,None), name = "padding_mask")
     
-    # 포지셔널 인코딩 + 드롭아웃
-    embeddings = tf.keras.layers.Embedding(max_length, d_model)(inputs)
+    # 입력 텐서를 임베딩 레이어를 통해서 d_model 차원의 벡터로 변환한다.
+    embeddings = tf.keras.layers.Embedding(vocab_size, d_model)(inputs)
     embeddings *= tf.math.sqrt(tf.cast(d_model, tf.float32))
     embeddings = PositionalEncoding(max_length, d_model)(embeddings)
+    outputs = tf.keras.layers.Dropout(rate=dropout)(embeddings)
     
     # 인코더를 num_layers개 쌓기
+    # 이전 레이어의 출력이 현재 레이어의 입력으로 사용된다. 맨 처음에는 embeddings가 사용된다.
     for i in range(num_layers):
         outputs = encoder_layer(dff=dff, d_model=d_model, num_heads=num_heads,
                                 dropout=dropout, name="encoder_layer_{}".format(i))([outputs, padding_mask])
@@ -197,9 +386,41 @@ def encoder(max_length, num_layers, dff, d_model, num_heads, dropout, name="enco
     
 # look ahead mask
 def create_look_ahead_mask(x):
-    seq_len = tf.shape(x)[1]
+    """
+    Look-ahead 마스크와 패딩 마스크를 생성하는 함수
+
+    Args:
+        - x (tf.Tensor): 입력 시퀀스. shape는 (batch_size, sequence_length)
+
+    Returns:
+        - tf.Tensor : Look-ahead와 패딩 마스크를 합친 마스크. shape는 (batch_size, 1, 1, sequence_length)
+        
+    Notes:
+        - tf.linalg.band_part(input, num_lower, num_upper, name=None)
+        - input 행렬에 대해서 대각선 기준(대각선이 0) num_lower만큼 대각선 아래 쪽 값을 살린다.
+        - num_upper만큼 대각선 위에 값을 살린다
+        - 예시)
+        if 'input' is [[ 0,  1,  2, 3]
+                       [-1,  0,  1, 2]
+                       [-2, -1,  0, 1]
+                       [-3, -2, -1, 0]],
+
+        tf.linalg.band_part(input, 1, -1) ==> [[ 0,  1,  2, 3]
+                                               [-1,  0,  1, 2]
+                                               [ 0, -1,  0, 1]
+                                               [ 0,  0, -1, 0]],
+
+        tf.linalg.band_part(input, 2, 1) ==> [[ 0,  1,  0, 0]
+                                              [-1,  0,  1, 0]
+                                              [-2, -1,  0, 1]
+                                              [ 0, -2, -1, 0]]   
+    """
+    
+    seq_len = tf.shape(x)[1]  # x의 2번째는 sequence_length
+    
     look_ahead_mask = 1 - tf.linalg.band_part(tf.ones((seq_len, seq_len)), -1, 0)
     padding_mask = create_padding_mask(x)
+    
     return tf.maximum(look_ahead_mask, padding_mask)
 
 
