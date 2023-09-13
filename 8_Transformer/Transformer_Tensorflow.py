@@ -75,11 +75,14 @@ class PositionalEncoding(tf.keras.layers.Layer):
         )
         
         # 배열의 짝수 인엑스(2i)에는 사인 함수 적용
-        angle_rads[:, 0::2] = tf.math.sin(angle_rads[:, 0::2])
+        sines = tf.math.sin(angle_rads[:, 0::2])
         
         #배열의 홀수 인덱스(2i+1)에는 코사인 함수 적용
-        angle_rads[:, 1::2] = tf.math.cos(angle_rads[:, 1::2])
+        cosines = tf.math.cos(angle_rads[:, 1::2])
         
+        angle_rads = np.zeros(angle_rads.shape)
+        angle_rads[:, 0::2] = sines
+        angle_rads[:, 1::2] = cosines
         
         pos_encoding = tf.constant(angle_rads)
         pos_encoding = pos_encoding[tf.newaxis, ...] # pos_encoding의 shape는 (1, position, d_model)
@@ -519,8 +522,8 @@ def decoder(max_length, vocab_size, num_layers, dff, d_model, num_heads, dropout
         tf.keras.Model: 디코더 모델
     """
     
-    # (None, d_model) shape의 입력
-    inputs = tf.keras.Input(shape=(None, d_model), name='inputs')
+    # (None,) shape의 입력
+    inputs = tf.keras.Input(shape=(None,), name='inputs')
     enc_outputs = tf.keras.Input(shape=(None, d_model), name = 'encoder_outputs')
     
     # look ahead mask, padding mask
@@ -588,12 +591,12 @@ def transformer(vocab_size, max_length, num_layers, dff, d_model, num_heads, dro
         name = 'dec_padding_mask')(inputs)
     
     # 인코더의 출력은 enc_outputs. 디코더로 전달된다.
-    enc_outputs = encoder(max_length=max_length, num_layers=num_layers, dff=dff,
+    enc_outputs = encoder(max_length=max_length, vocab_size=vocab_size, num_layers=num_layers, dff=dff,
                           d_model=d_model, num_heads=num_heads, dropout=dropout)(
                               inputs = [inputs, enc_padding_mask])
     
     # 디코더의 출력은 dec_outputs. 출력층으로 전달된다.
-    dec_outputs = decoder(max_length=max_length, num_layers=num_layers, dff=dff,
+    dec_outputs = decoder(max_length=max_length, vocab_size=vocab_size, num_layers=num_layers, dff=dff,
                           d_model=d_model, num_heads=num_heads, dropout=dropout)(
                               inputs = [dec_inputs, enc_outputs, look_ahead_mask, dec_padding_mask])
     
@@ -603,3 +606,28 @@ def transformer(vocab_size, max_length, num_layers, dff, d_model, num_heads, dro
     return tf.keras.Model(inputs = [inputs, dec_inputs], outputs = outputs, name=name)
 
 
+small_transformer = transformer(
+    vocab_size = 9000,
+    max_length=50,
+    num_layers = 4,
+    dff = 512,
+    d_model = 128,
+    num_heads = 4,
+    dropout = 0.3,
+    name="small_transformer")
+
+
+
+class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
+    
+    def __init__(self, d_model, warmup_steps=4000):
+        self.d_model = d_model
+        self.d_model = tf.cast(self.d_model, tf.float32)
+        self.warmup_steps = warmup_steps
+        
+    def __call__(self, step):
+        step = tf.cast(step, tf.float32)
+        arg1 = tf.math.rsqrt(step)
+        arg2 = step * (self.warmup_steps ** -1.5)
+        
+        return tf.math.rsqrt(self.d_model) * tf.math.minimum(arg1, arg2)
