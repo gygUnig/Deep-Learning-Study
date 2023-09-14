@@ -9,3 +9,4 @@ txt_datasets/
 
 6_RNN/.data/
 8_Transformer/ChatBotData.csv
+9_BERT/checkpoint/
