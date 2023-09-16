@@ -6,7 +6,11 @@ This repository contains materials studied while implementing various deep learn
 
 
 
-## Directory Structure
+## Directory Structure  
+
+### [Study](Study/)  
+- 다양한 공부 자료를 통해서 학습한 내용을 모아둔 디렉토리입니다.  
+
 
 ### [1. Linear Regression](1_Linear_Regression/)
 - Implementations of linear regression models from scratch, Pytorch, Tensorflow
