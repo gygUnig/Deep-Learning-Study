@@ -10,6 +10,7 @@ txt_datasets/
 6_RNN/.data/
 8_Transformer/ChatBotData.csv
 9_BERT/checkpoint/
+10_Decision_Tree/CommonLit_data/
 
 Study/Hugging_Face_Transformers/saving_folder
 Study/Hugging_Face_Transformers/saving_folder2
