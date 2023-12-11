@@ -7,8 +7,8 @@ import tensorflow as tf
 
 
 # data
-train_x = np.array([[100],[125],[150],[190],[206]]) # weight
-train_y = np.array([[105],[122],[155],[176],[207]]) # height
+train_x = np.array([[100],[125],[150],[190],[206]])
+train_y = np.array([[105],[122],[155],[176],[207]])
 
 
 # init W, b

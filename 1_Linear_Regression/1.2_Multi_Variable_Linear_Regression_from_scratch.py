@@ -5,10 +5,11 @@
 import numpy as np
 
 # data load
-data = np.loadtxt('../csv_datasets/data_test_score.csv', delimiter=',')  # shape (25, 4)
+data = np.loadtxt('../Datasets/data_test_score.csv', delimiter=',')  # shape (25, 4)
 
 # data shuffle
-np.random.seed(1)
+SEED=1
+np.random.seed(SEED)
 np.random.shuffle(data)
 
 # split train, test
@@ -77,4 +78,4 @@ predict = hypo_function(w, b, test_x)
 real = test_y
 
 for p,r in zip(predict, real):
-    print('predict:',p,'real:',r)
+    print('predict:', p, 'real:', r)

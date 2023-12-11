@@ -7,8 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # data
-train_x = torch.FloatTensor([[100],[125],[150],[190],[206]]) # weight
-train_y = torch.FloatTensor([[105],[122],[155],[176],[207]]) # height
+train_x = torch.FloatTensor([[100],[125],[150],[190],[206]]) 
+train_y = torch.FloatTensor([[105],[122],[155],[176],[207]]) 
 
 
 # init W, b

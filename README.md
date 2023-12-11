@@ -14,7 +14,7 @@ This repository contains materials studied while implementing various deep learn
 
 ### [1. Linear Regression](1_Linear_Regression/)
 - Implementations of linear regression models from scratch, Pytorch, Tensorflow
-- Datasets: Weight-Height, Test Score
+- Datasets: Test Score
 
 ### [2. Logistic Regression](2_Logistic_Regression/)
 - Implementations of logistic regression models from scratch, Pytorch, Tensorflow
