@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 
 # load data
-data = np.loadtxt("../csv_datasets/data_diabetes.csv", delimiter=',', dtype=np.float32)
+data = np.loadtxt("../Datasets/data_diabetes.csv", delimiter=',', dtype=np.float32)
 
 # data shuffle
 np.random.seed(1)
