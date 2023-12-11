@@ -4,7 +4,7 @@
 import numpy as np
 
 # data load
-data = np.loadtxt('../csv_datasets/data_diabetes.csv', delimiter=',') # shape (759, 9)
+data = np.loadtxt('../Datasets/data_diabetes.csv', delimiter=',') # shape (759, 9)
 
 # data shuffle
 np.random.seed(1)
@@ -86,7 +86,6 @@ for epoch in range(n_epoch):
 # test
 test_predict = hypo_function(w,b,test_x)
 predict = (test_predict >= 0.5).astype(int)
-
 
 
 # accuracy

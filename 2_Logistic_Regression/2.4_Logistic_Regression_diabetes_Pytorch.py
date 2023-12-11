@@ -8,7 +8,7 @@ import numpy as np
 
 
 # load data
-data = np.loadtxt('../csv_datasets/data_diabetes.csv',delimiter=',')  # (759, 9)
+data = np.loadtxt('../Datasets/data_diabetes.csv',delimiter=',')  # (759, 9)
 
 # data shuffle
 np.random.seed(1)
