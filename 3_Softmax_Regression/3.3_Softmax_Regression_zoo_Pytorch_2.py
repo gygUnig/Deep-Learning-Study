@@ -9,7 +9,7 @@ import torch.optim as optim
 import numpy as np
 
 # load data
-data = np.loadtxt('../csv_datasets/data_zoo.csv', delimiter=',')  # (101, 17)
+data = np.loadtxt('../Datasets/data_zoo.csv', delimiter=',')  # (101, 17)
 
 # data shuffle
 np.random.seed(1)

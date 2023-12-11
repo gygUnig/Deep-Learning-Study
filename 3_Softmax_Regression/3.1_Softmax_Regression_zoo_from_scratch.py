@@ -4,7 +4,7 @@
 import numpy as np
 
 # data load
-data = np.loadtxt('../csv_datasets/data_zoo.csv',delimiter=',')  # (101, 17)
+data = np.loadtxt('../Datasets/data_zoo.csv',delimiter=',')  # (101, 17)
 
 # data shuffle
 np.random.seed(1)
