@@ -15,6 +15,7 @@ Datasets/ratings_test.csv
 
 6_RNN/.data/
 8_Transformer/ChatBotData.csv
+9_BERT
 9_BERT/checkpoint/
 10_Decision_Tree/CommonLit_data/
 11_Random_Forest/CommonLit_data/
