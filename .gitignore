@@ -1,6 +1,7 @@
-image_datasets/
-csv_datasets/
-txt_datasets/
+Datasets/mnist_train.csv
+Datasets/mnist_test.csv
+
+
 
 
 5_CNN/checkpoint/

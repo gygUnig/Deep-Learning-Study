@@ -15,12 +15,12 @@ import matplotlib.pyplot as plt
 import time
 
 start_time = time.time()
-print("Start")
+print("Code Start")
 
 
 # train, test data load
-data = np.loadtxt("../csv_datasets/data_mnist_train.csv", delimiter=',')  # (60000, 785)
-test_data = np.loadtxt("../csv_datasets/data_mnist_test.csv", delimiter=',')  # (10000, 785)
+data = np.loadtxt("../Datasets/mnist_train.csv", delimiter=',', skiprows=1)  # (60000, 785)
+test_data = np.loadtxt("../Datasets/mnist_test.csv", delimiter=',', skiprows=1)  # (10000, 785)
 
 # data shuffle
 np.random.seed(1)
@@ -83,7 +83,7 @@ for epoch in range(n_epoch):
         test_cost = nn.CrossEntropyLoss()(model(test_x),test_y.squeeze())
 
     if (epoch + 1) % 100 == 0:
-        print("epoch {}/{} train_cost:{} test_cost:{}".format(
+        print("epoch {}/{} train_loss:{} test_loss:{}".format(
             epoch+1, n_epoch, cost.item(), test_cost.item()
         ))
     

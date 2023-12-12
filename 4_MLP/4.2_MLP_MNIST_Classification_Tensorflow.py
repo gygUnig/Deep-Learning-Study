@@ -13,8 +13,8 @@ start_time = time.time()
 print("=========start========")
 
 # train, test data load
-data = np.loadtxt("../csv_datasets/data_mnist_train.csv", delimiter=',', dtype=np.float32)  # (60000, 785)
-test_data = np.loadtxt("../csv_datasets/data_mnist_test.csv", delimiter=',', dtype=np.float32)  # (10000, 785)
+data = np.loadtxt("../Datasets/mnist_train.csv", delimiter=',', dtype=np.float32, skiprows=1)  # (60000, 785)
+test_data = np.loadtxt("../Datasets/mnist_test.csv", delimiter=',', dtype=np.float32, skiprows=1)  # (10000, 785)
 
 print("=========data loaded========")
 
