@@ -5,15 +5,15 @@
 import tensorflow as tf
 import numpy as np
 import time
-
+import os
 
 start_time = time.time()
 print("===========Start============")
 
 
 # Load data
-train_data = np.loadtxt("../csv_datasets/data_mnist_train.csv", delimiter=',')
-test_data = np.loadtxt("../csv_datasets/data_mnist_test.csv", delimiter=',')
+train_data = np.loadtxt("../Datasets/data_mnist_train.csv", delimiter=',')
+test_data = np.loadtxt("../Datasets/data_mnist_test.csv", delimiter=',')
 
 print("========data loaded==========")
 
@@ -81,6 +81,10 @@ model.fit(train_x, train_y, epochs=n_epoch, batch_size=batch_size, verbose=1)
 
 
 # model save
+directory = "./checkpoint"
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
 model.save('./checkpoint/5.4_CNN_MNIST_Tensorflow.h5')
 
 

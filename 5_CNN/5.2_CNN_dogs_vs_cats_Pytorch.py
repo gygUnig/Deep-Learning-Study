@@ -9,6 +9,7 @@ import torch.nn as nn
 from torchvision import transforms, datasets
 from torch.utils.data import DataLoader
 import time
+import os
 
 start_time = time.time()
 print("Start")
@@ -32,7 +33,7 @@ transform = transforms.Compose([
 
 # Load data - at this point, torchvision.datasets.ImageFolder finds subdirectories and loads each image,
 # classifying them into separate classes. Labels are automatically assigned, like dog as 0, cat as 1, etc.
-dataset = datasets.ImageFolder('../image_datasets/dogs_vs_cats_image/train', transform=transform)
+dataset = datasets.ImageFolder('../Datasets/dogs_vs_cats_image/train', transform=transform)
 
 # ImageFolder separates each class into directories. The names of the directories are used as class labels and the images in the subdirectories are considered as samples of the respective class.
 # When loading images, the given 'transform' is applied to perform operations such as resizing images and converting to tensors.
@@ -143,6 +144,10 @@ for epoch in range(n_epochs):
     ))
 
 # save model
+directory = "./checkpoint"
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
 torch.save(model.state_dict(),"./checkpoint/5.2_CNN_dogs_vs_cats_Pytorch.pt")
 
 

@@ -1,6 +1,7 @@
 # dog and cat Classification(kaggle data) - CNN practice
 # Using tensorflow2
 
+import os
 import tensorflow as tf
 from tensorflow.keras import layers, models, optimizers
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -21,7 +22,7 @@ train_datagen = ImageDataGenerator(rescale=1./255, validation_split=0.2)
 # Load Train Data
 # train_data는 훈련 데이터셋의 이미지와 레이블을 모두 포함한다.
 train_data = train_datagen.flow_from_directory(
-    '../image_datasets/dogs_vs_cats_image/train',
+    '../Datasets/dogs_vs_cats_image/train',
     target_size=image_size,
     batch_size=64,
     class_mode='binary',
@@ -31,7 +32,7 @@ train_data = train_datagen.flow_from_directory(
 
 # Load Validation Data
 val_data = train_datagen.flow_from_directory(
-    '../image_datasets/dogs_vs_cats_image/train',
+    '../Datasets/dogs_vs_cats_image/train',
     target_size=image_size,
     batch_size=64,
     class_mode='binary',

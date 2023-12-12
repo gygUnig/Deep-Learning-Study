@@ -7,6 +7,7 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 import time
+import os
 
 start_time = time.time()
 print("Start")
@@ -16,8 +17,8 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 # train, test data load
-train_data = np.loadtxt("../csv_datasets/data_mnist_train.csv", delimiter=',')  # (60000, 785)
-test_data = np.loadtxt("../csv_datasets/data_mnist_test.csv", delimiter=',')  # (10000, 785)
+train_data = np.loadtxt("../Datasets/mnist_train.csv", delimiter=',', skiprows=1)  # (60000, 785)
+test_data = np.loadtxt("../Datasets/mnist_test.csv", delimiter=',', skiprows=1)  # (10000, 785)
 
 
 # data shuffle
@@ -138,7 +139,11 @@ for epoch in range(n_epoch):
 
 
 # save model
-torch.save(model.state_dict(), "./checkpoint/5.1_CNN_MNIST_Pytorch.pt")
+directory = "./checkpoint"
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
+torch.save(model.state_dict(), os.path.join(directory, "5.1_CNN_MNIST_Pytorch.pt"))
 
 
 # test & accuracy
@@ -156,6 +161,6 @@ hours, rem = divmod(total_time, 3600)
 minutes, seconds = divmod(rem, 60)
 
 
-print("{}:{}:{:.2f}".format(
+print("Training Time {}:{}:{:.2f}".format(
     int(hours), int(minutes), seconds
 ))

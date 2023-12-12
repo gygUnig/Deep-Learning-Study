@@ -5,13 +5,14 @@ Convolutional Neural Network을 구현했습니다.
 ---
 
 ### Pytorch
-- 5.1 : MNIST Dataset을 분류하는 CNN 모델입니다.
-- 5.2 : 개와 고양이를 분류하는 CNN 모델이며, 5.3는 5.2의 코드에 k fold validation 을 적용한 것입니다.     
+- 5.1 : MNIST Dataset을 분류하는 CNN 모델입니다.  
+- 5.2 : 개와 고양이를 분류하는 CNN 모델입니다.  
+- 5.3 : 5.2의 코드에 k fold validation 을 적용한 것입니다.      
 
 
 ### Tensorflow
-- 5.4 : MNIST Dataset을 분류하는 CNN 모델입니다.
-- 5.5 : 개와 고양이를 분류하는 CNN 모델입니다.  
+- 5.4 : MNIST Dataset을 분류하는 CNN 모델입니다.  
+- 5.5 : 개와 고양이를 분류하는 CNN 모델입니다.    
 
 ---
 

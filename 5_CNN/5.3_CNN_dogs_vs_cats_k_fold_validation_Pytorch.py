@@ -1,7 +1,7 @@
 # dog and cat Classification(kaggle data) - CNN practice
 # Use k-fold validation
 
-
+import os
 import numpy as np
 import torch
 import torch.optim as optim
@@ -34,7 +34,7 @@ transform = transforms.Compose([
 
 # Load data - at this point, torchvision.datasets.ImageFolder finds subdirectories and loads each image,
 # classifying them into separate classes. Labels are automatically assigned, like dog as 0, cat as 1, etc.
-dataset = datasets.ImageFolder('../image_datasets/dogs_vs_cats_image/train', transform=transform)
+dataset = datasets.ImageFolder('../Datasets/dogs_vs_cats_image/train', transform=transform)
 
 # ImageFolder separates each class into directories. The names of the directories are used as class labels and the images in the subdirectories are considered as samples of the respective class.
 # When loading images, the given 'transform' is applied to perform operations such as resizing images and converting to tensors.
@@ -129,6 +129,12 @@ kfold = KFold(n_splits=k_folds, shuffle=True)
 
 # List for storing accuracy for each fold
 accuracy_list_k_fold = []
+
+# make checkpoint dir
+directory = "./checkpoint"
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
 
 # kfold.split(dataset) splits the dataset into 'n_splits' and returns indices of train and test data.
 for fold, (train_ids, test_ids) in enumerate(kfold.split(dataset)): # get fold number and corresponding train, test indices by running this with enumerate
