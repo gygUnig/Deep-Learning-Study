@@ -22,8 +22,8 @@ learning_rate = 0.001
 
 
 # load dataset
-train_data = np.loadtxt('../csv_datasets/data_mnist_train.csv', delimiter=',', dtype=np.float32)
-test_data = np.loadtxt('../csv_datasets/data_mnist_test.csv', delimiter=',', dtype=np.float32)
+train_data = np.loadtxt('../Datasets/mnist_train.csv', delimiter=',', dtype=np.float32, skiprows=1)
+test_data = np.loadtxt('../Datasets/mnist_test.csv', delimiter=',', dtype=np.float32, skiprows=1)
 
 
 print("====data loaded====")

@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
+import os
 from torch.utils.data import Dataset, DataLoader
 import time
 
@@ -31,7 +31,7 @@ learning_rate = 0.001
 # make Custom DataLoader
 class MnistDataset(Dataset):
     def __init__(self, csv_file):
-        data = np.loadtxt(csv_file, delimiter=',', dtype=np.float32)
+        data = np.loadtxt(csv_file, delimiter=',', dtype=np.float32, skiprows=1)
 
         self.x_data = torch.tensor(data[:, 1:], dtype=torch.float32).to(device)
         self.y_data = torch.tensor(data[:, :1], dtype=torch.float32).to(device)
@@ -47,8 +47,8 @@ class MnistDataset(Dataset):
 
 
 # train, test dataset
-train_dataset = MnistDataset('../csv_datasets/data_mnist_train.csv')
-test_dataset = MnistDataset('../csv_datasets/data_mnist_test.csv')
+train_dataset = MnistDataset('../Datasets/mnist_train.csv')
+test_dataset = MnistDataset('../Datasets/mnist_test.csv')
 
 
 # Data Loader
@@ -123,6 +123,10 @@ for epoch in range(n_epoch):
     ))
 
 # save model
+directory = "./checkpoint"
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
 torch.save(model.state_dict(), "./checkpoint/6.1_LSTM_MNIST_Pytorch.pt")
 
 

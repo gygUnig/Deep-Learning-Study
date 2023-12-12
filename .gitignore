@@ -1,5 +1,7 @@
 Datasets/mnist_train.csv
 Datasets/mnist_test.csv
+Datasets/ratings_train.csv
+Datasets/ratings_test.csv
 
 
 
